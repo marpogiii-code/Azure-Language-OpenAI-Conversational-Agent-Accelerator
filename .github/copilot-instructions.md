@@ -14,11 +14,12 @@ Key concepts in this codebase:
 ## Architecture and coding expectations
 - Keep the project behavior deterministic and explainable: prefer explicit route selection, confidence checks, and structured responses.
 - Preserve the existing routing model. Changes to route types, confidence thresholds, or fallback behavior should be intentional and aligned with the README and `src/backend/src/README.md`.
+- Keep route and agent logic explicit; do not add broad "intelligent" fallback behavior that bypasses the configured routing flow or confidence gates.
 - Use environment variables for Azure endpoints and deployment names; do not hardcode secrets or resource IDs.
 - Maintain compatibility with both orchestration patterns used here:
   - `semantic_kernel_app.py` / `semantic_kernel_orchestrator.py`
   - `unified_app.py` / `unified_conversation_orchestrator.py`
-- When adding or changing app behavior, keep the frontend and backend contract in sync.
+- When adding or changing app behavior, keep the frontend and backend contract in sync, and prefer targeted updates that do not introduce new request/response shapes without updating the corresponding UI and tests.
 
 ## Repository layout
 - Root-level docs and deployment setup are in `README.md`, `docs/`, and `azure.yaml`.
@@ -51,6 +52,7 @@ If a change affects only Python logic or routing, prefer a focused backend check
   - fallback logic
   - Azure service integration
   - UI concerns
+- When an LLM call returns `Select a Foundry project in Foundry Toolkit extension to use Foundry models.`, handle it as a missing Foundry project selection/configuration issue, not as a malformed JSON response. Surface an actionable error and avoid attempting to parse this provider message as model output.
 - For Azure AI Language features, honor confidence thresholds and fail gracefully when no intent or answer is found.
 - For business actions (order status, refund, cancellation), keep the response format consistent with existing patterns and test expectations.
 - If a feature affects deployed behavior, update the relevant docs in `README.md`, `src/backend/src/README.md`, or `docs/` where appropriate.
